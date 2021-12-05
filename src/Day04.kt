@@ -36,7 +36,7 @@ fun main() {
             }
 
             (0..4).forEach { col ->
-                if (checkedOf[col][0] && checkedOf[col][1] && checkedOf[col][2] && checkedOf[col][3] && checkedOf[col][4])
+                if (checkedOf[0][col] && checkedOf[1][col] && checkedOf[2][col] && checkedOf[3][col] && checkedOf[4][col])
                     return true
             }
 
@@ -105,12 +105,38 @@ fun main() {
     }
 
     fun part2(input: List<String>): Int {
+        val (drawnBalls, cards) = parseInput(input)
+
+        val cardsLeft = cards.toMutableList()
+
+        drawnBalls.forEach { number ->
+            println("Next number: $number")
+
+            val cardsToRemove = mutableListOf<BingoCard>()
+            cardsLeft.forEach { card ->
+                card.checkNumber(number)
+                println(card)
+                if (card.hasBingo()) {
+                    println("Bingo! Removing card!")
+
+                    cardsToRemove.add(card)
+                    if (cardsLeft.size == 1) {
+                        println("Number = $number")
+                        println("SumOfUncheckedNumbers = ${card.sumOfUncheckedNumbers()}")
+                        return number * card.sumOfUncheckedNumbers()
+                    }
+                }
+            }
+            cardsLeft.removeAll(cardsToRemove)
+        }
+
         return input.size
     }
 
     // test if implementation meets criteria from the description, like:
     val testInput = readInput("Day04_test")
     check(part1(testInput) == 4512)
+    check(part2(testInput) == 1924)
 
     val input = readInput("Day04")
     println(part1(input))

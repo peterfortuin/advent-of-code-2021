@@ -1,11 +1,11 @@
 fun main() {
     class BingoCard(val numbers: List<List<Int>>) {
-        var checkedOf = listOf(
-            listOf(false, false, false, false, false),
-            listOf(false, false, false, false, false),
-            listOf(false, false, false, false, false),
-            listOf(false, false, false, false, false),
-            listOf(false, false, false, false, false)
+        val checkedOf = listOf(
+            mutableListOf(false, false, false, false, false),
+            mutableListOf(false, false, false, false, false),
+            mutableListOf(false, false, false, false, false),
+            mutableListOf(false, false, false, false, false),
+            mutableListOf(false, false, false, false, false)
         )
 
         override fun toString(): String {
@@ -16,6 +16,41 @@ fun main() {
                     else
                         acc + "$number".padStart(3)
                 } + "\n"
+            }
+        }
+
+        fun checkNumber(numberToCheck: Int) {
+            numbers.forEachIndexed { rowNumber, row ->
+                row.forEachIndexed { colNumber, number ->
+                    if (number == numberToCheck) {
+                        checkedOf[rowNumber][colNumber] = true
+                    }
+                }
+            }
+        }
+
+        fun hasBingo(): Boolean {
+            checkedOf.forEach { row ->
+                if (row[0] && row[1] && row[2] && row[3] && row[4])
+                    return true
+            }
+
+            (0..4).forEach { col ->
+                if (checkedOf[col][0] && checkedOf[col][1] && checkedOf[col][2] && checkedOf[col][3] && checkedOf[col][4])
+                    return true
+            }
+
+            return false
+        }
+
+        fun sumOfUncheckedNumbers(): Int {
+            return checkedOf.foldIndexed(0) { rowNUmber, acc, row ->
+                acc + row.foldIndexed(0) { colNumber, acc, checked ->
+                    if (!checked)
+                        acc + numbers[rowNUmber][colNumber]
+                    else
+                        acc
+                }
             }
         }
     }
@@ -30,7 +65,7 @@ fun main() {
 
         val cardsInput = input.subList(2, input.size)
 
-        cardsInput.windowed(6, 6)
+        val cards = cardsInput.windowed(6, 6)
             .map { cardInput ->
                 cardInput.mapNotNull { cardLine ->
                     if (cardLine.isEmpty())
@@ -45,15 +80,27 @@ fun main() {
             .map { cardNumbers ->
                 BingoCard(cardNumbers)
             }
-            .forEach {
-                println(it)
-            }
 
-        return ParsedInput(drawnBalls, emptyList())
+        return ParsedInput(drawnBalls, cards)
     }
 
     fun part1(input: List<String>): Int {
         val (drawnBalls, cards) = parseInput(input)
+        drawnBalls.forEach { number ->
+            println("Next number: $number")
+
+            cards.forEach { card ->
+                card.checkNumber(number)
+                println(card)
+                if (card.hasBingo()) {
+                    println("Bingo!")
+                    println("Number = $number")
+                    println("SumOfUncheckedNumbers = ${card.sumOfUncheckedNumbers()}")
+                    return number * card.sumOfUncheckedNumbers()
+                }
+            }
+        }
+
         return input.size
     }
 

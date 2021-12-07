@@ -1,40 +1,49 @@
 fun main() {
-    fun part1(input: List<String>): Int {
-        var lanternFish = input.first().split(',').map { it.toInt() }.toMutableList()
+    fun growFish(input: List<String>, days: Int): Long {
+        var lanternFish = input.first().split(',').map { it.toInt() }.map { Pair(1L, it) }.toMutableList()
         println("Initial state: $lanternFish")
 
-        (1..80).forEach {
-            var numberOfFishToAdd = 0
+        (1..days).forEach {
+            var numberOfFishToAdd = 0L
 
-            lanternFish = lanternFish.map { daysUntilNew ->
-                var daysUntilNewRemaining = daysUntilNew
+            lanternFish = lanternFish.map { fishGroup ->
+                var daysUntilNewRemaining = fishGroup.second
 
                 daysUntilNewRemaining -= 1
 
                 if (daysUntilNewRemaining == -1) {
                     daysUntilNewRemaining = 6
-                    numberOfFishToAdd += 1
+                    numberOfFishToAdd += fishGroup.first
                 }
 
-                daysUntilNewRemaining
+                Pair(fishGroup.first, daysUntilNewRemaining)
             }.toMutableList()
 
-            lanternFish.addAll(IntArray(numberOfFishToAdd) { 8 }.toList())
+            lanternFish.add(Pair(numberOfFishToAdd, 8))
 
-            println("After ${it} day${if (it > 1) "s" else " "}:  $lanternFish")
+            val totalFish = lanternFish.fold(0L) { acc, fish -> acc + fish.first }
+
+            println("After ${it} day${if (it > 1) "s" else " "}:  $totalFish")
         }
-        println("Number of lanternfish = ${lanternFish.size}")
-        return lanternFish.size
+
+        val totalFish = lanternFish.fold(0L) { acc, fish -> acc + fish.first }
+        println("Number of lanternfish = $totalFish")
+        return totalFish
+    }
+
+    fun part1(input: List<String>): Long {
+        return growFish(input, 80)
     }
 
     fun part2(input: List<String>): Long {
-        return input.size.toLong()
+        return growFish(input, 256)
     }
 
     // test if implementation meets criteria from the description, like:
     val testInput = readInput("Day06_test")
-    check(part1(testInput) == 5934)
+    check(part1(testInput) == 5934L)
     check(part2(testInput) == 26984457539)
+    Long.MAX_VALUE
 
     val input = readInput("Day06")
     println(part1(input))

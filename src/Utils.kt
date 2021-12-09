@@ -18,5 +18,9 @@ infix fun Int.toward(to: Int): IntProgression {
 }
 
 fun List<Double>.median(): Double {
-    return this.sorted().let { (it[it.size / 2] + it[(it.size - 1) / 2]) / 2 }
+    return sorted().let { (it[it.size / 2] + it[(it.size - 1) / 2]) / 2 }
+}
+
+fun String.sortChars(): String {
+    return toCharArray().sorted().joinToString()
 }

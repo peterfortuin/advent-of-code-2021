@@ -16,3 +16,7 @@ infix fun Int.toward(to: Int): IntProgression {
     val step = if (this > to) -1 else 1
     return IntProgression.fromClosedRange(this, to, step)
 }
+
+fun List<Double>.median(): Double {
+    return this.sorted().let { (it[it.size / 2] + it[(it.size - 1) / 2]) / 2 }
+}

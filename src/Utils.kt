@@ -22,5 +22,24 @@ fun List<Double>.median(): Double {
 }
 
 fun String.sortChars(): String {
-    return toCharArray().sorted().joinToString()
+    return toCharArray().sorted().joinToString("")
+}
+
+fun String.containsLetters(letters: String): Boolean {
+    letters.forEach { letter ->
+        if (!this.contains(letter))
+            return false
+    }
+
+    return true
+}
+
+fun String.subtractLetters(lettersToSubtract: String): String {
+    val letters = this.toCharArray().toMutableList()
+
+    lettersToSubtract.toCharArray().forEach {
+        letters.remove(it)
+    }
+
+    return letters.joinToString("")
 }

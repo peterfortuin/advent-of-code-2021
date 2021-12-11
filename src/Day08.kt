@@ -3,18 +3,41 @@ fun main() {
         val decodeMap = mutableMapOf<String, Int>()
 
         init {
-            val signalPatternList = signalPatterns.trim().split(" ")
+            val signalPatternList = signalPatterns.trim().split(" ").map { it.sortChars() }
 
-            // 0 has 6 elements
-            decodeMap[signalPatternList.first { pattern -> pattern.length == 2 }.sortChars()] = 1
-            // 2 has 5 elements
-            // 3 has 5 elements
-            decodeMap[signalPatternList.first { pattern -> pattern.length == 4 }.sortChars()] = 4
-            // 5 has 5 elements
-            // 6 has 6 elements
-            decodeMap[signalPatternList.first { pattern -> pattern.length == 3 }.sortChars()] = 7
-            decodeMap[signalPatternList.first { pattern -> pattern.length == 7 }.sortChars()] = 8
-            // 9 has 6 elements
+            val pattern1 = signalPatternList.first { pattern -> pattern.length == 2 }
+
+            val pattern4 = signalPatternList.first { pattern -> pattern.length == 4 }
+
+            val pattern9 = signalPatternList
+                .first { pattern -> pattern.length == 6 && pattern.containsLetters(pattern4) }
+
+            val pattern0 = signalPatternList.first { pattern ->
+                pattern.length == 6 && pattern != pattern9 && pattern.containsLetters(pattern1)
+            }
+
+            val pattern3 =
+                signalPatternList.first { pattern -> pattern.length == 5 && pattern.containsLetters(pattern1) }
+
+            val pattern5 = signalPatternList.first { pattern ->
+                pattern.length == 5
+                        && pattern.subtractLetters(pattern9).isEmpty()
+                        && pattern != pattern3
+            }
+
+            decodeMap[pattern1] = 1
+            decodeMap[pattern4] = 4
+            decodeMap[signalPatternList.first { pattern -> pattern.length == 3 }] = 7
+            decodeMap[signalPatternList.first { pattern -> pattern.length == 7 }] = 8
+            decodeMap[pattern9] = 9
+            decodeMap[pattern0] = 0
+            decodeMap[signalPatternList.first { pattern -> pattern.length == 6 && pattern != pattern9 && pattern != pattern0 }] =
+                6
+            decodeMap[pattern3] = 3
+
+            decodeMap[pattern5] = 5
+            decodeMap[signalPatternList.first { pattern -> pattern.length == 5 && pattern != pattern3 && pattern != pattern5 }] =
+                2
         }
 
         fun decode(values: String): List<Int> {
@@ -22,7 +45,8 @@ fun main() {
                 .trim()
                 .split(" ")
                 .mapNotNull { value ->
-                    decodeMap[value.sortChars()]
+                    val decodedValue = decodeMap[value.sortChars()]
+                    decodedValue
                 }
         }
     }
@@ -51,9 +75,11 @@ fun main() {
                 val decoder = Decoder(line[0])
                 decoder.decode(line[1])
             }
-            .flatten()
+            .map { numbers ->
+                numbers[0] * 1000 + numbers[1] * 100 + numbers[2] * 10 + numbers[3]
+            }
             .sum()
-        println(sum)
+
         return sum
     }
 
